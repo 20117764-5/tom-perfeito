@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import Meyda from 'meyda'; 
 import { ToneDisplay } from './ToneDisplay';
 import { detectChord } from '../lib/chordEstimator';
-import { estimateKey } from '../lib/keyEstimator'; // Assumindo que você criou este no passo anterior
+import { estimateKey } from '../lib/keyEstimator'; 
 
 const NOTES = ["Dó", "Dó#", "Ré", "Ré#", "Mi", "Fá", "Fá#", "Sol", "Sol#", "Lá", "Lá#", "Si"];
 
@@ -19,7 +19,6 @@ export function PitchTracker({ stream }: { stream: MediaStream }) {
   const [currentChord, setCurrentChord] = useState<string | null>(null);
   const [detectedKey, setDetectedKey] = useState<string | null>(null);
   
-  // Memórias separadas para não misturar acorde com nota
   const shortTermNoteHistory = useRef<string[]>([]);
   const shortTermChordHistory = useRef<string[]>([]);
   const longTermNoteHistory = useRef<string[]>([]);
@@ -58,7 +57,6 @@ export function PitchTracker({ stream }: { stream: MediaStream }) {
           if (maxEnergy > 0.85 && maxIndex !== -1) {
             const note = NOTES[maxIndex];
             
-            // Estabiliza a nota (Curto prazo)
             shortTermNoteHistory.current.push(note);
             if (shortTermNoteHistory.current.length > 15) shortTermNoteHistory.current.shift();
 
@@ -72,7 +70,6 @@ export function PitchTracker({ stream }: { stream: MediaStream }) {
             
             setCurrentNote(stabilizedNote);
 
-            // Alimenta o cálculo do Tom da Música (Longo prazo)
             longTermNoteHistory.current.push(stabilizedNote);
             if (longTermNoteHistory.current.length > 200) longTermNoteHistory.current.shift();
 
@@ -86,7 +83,6 @@ export function PitchTracker({ stream }: { stream: MediaStream }) {
           const chord = detectChord(chromaArray);
           
           if (chord) {
-            // Estabiliza o acorde
             shortTermChordHistory.current.push(chord);
             if (shortTermChordHistory.current.length > 15) shortTermChordHistory.current.shift();
 
